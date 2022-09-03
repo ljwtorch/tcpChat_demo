@@ -13,13 +13,16 @@ func process(conn net.Conn) {
 		//创建一个新的切片 以防后边有其他
 		buf := make([]byte, 1024)
 		//1.等待客户端通过conn发送信息
+
 		//2.如果客户端没有write，那么协程就会阻塞在这里
 		//fmt.Printf("服务器在等待客户端 %s 发送信息\n", conn.RemoteAddr().String())
-		n, err := conn.Read(buf) //从conn读取
+		//从conn读取，这里的buf一定要截取一下，不然后边会有很多空格
+		n, err := conn.Read(buf)
 		if err != nil {
 			fmt.Println("客户端退出 err =", err)
 			return
 		}
+
 		//3.显示客户端发送的内容到服务器的终端
 		fmt.Println(string(buf[:n]))
 	}
@@ -32,7 +35,8 @@ func main() {
 		fmt.Println("listen err =", err)
 		return
 	}
-	defer listen.Close() //延时关闭listen
+	//延时关闭listen
+	defer listen.Close()
 	//循环等待客户端链接
 	for {
 		//等待客户端链接
